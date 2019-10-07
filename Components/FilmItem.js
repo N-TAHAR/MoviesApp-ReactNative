@@ -8,6 +8,7 @@ class FilmItem extends PureComponent {
   render() {
     
     const { film, displayDetailForFilm } = this.props
+    console.log(film)
 
     return (
       <TouchableOpacity style={styles.main_container} onPress={() => displayDetailForFilm(film.id)}>

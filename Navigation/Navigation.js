@@ -22,7 +22,7 @@ const SearchStackNavigator = createStackNavigator({
     navigationOptions: {
       title: 'Détail du film',
       headerStyle: {
-        backgroundColor: '#101010',
+        backgroundColor: '#050505',
       },
       headerTintColor: 'gold',
       headerTitleStyle: {

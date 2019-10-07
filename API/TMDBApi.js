@@ -16,3 +16,9 @@ export function getFilmDetailFromApi (id) {
     .then((response) => response.json())
     .catch((error) => console.error(error));
 }
+
+export function getFilmTrailerFromApi (id) {
+  return fetch('https://api.themoviedb.org/3/movie/' + id + '/videos?api_key=' + TMDB_API + '&language=fr')
+    .then((response) => response.json())
+    .catch((error) => console.error(error));
+}

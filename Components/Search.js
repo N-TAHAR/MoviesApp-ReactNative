@@ -140,7 +140,6 @@ const styles = StyleSheet.create ({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: 'rgba(10,10,10,0.5)'
   }
 })
 
