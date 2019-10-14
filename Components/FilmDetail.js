@@ -1,21 +1,70 @@
 // Components/FilmDetail.js
 
 import React from 'react'
-import { StyleSheet, View, Text, ActivityIndicator, Image } from 'react-native'
-import { Rating, AirbnbRating } from 'react-native-ratings'
+import { StyleSheet, View, Text, ActivityIndicator, Image, Share, TouchableOpacity } from 'react-native'
+import { AirbnbRating } from 'react-native-ratings'
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import { ScrollView } from 'react-native-gesture-handler'
 import moment from 'moment'
 import numeral from 'numeral'
+import { connect } from 'react-redux'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faHeart as fasFaHeart } from '@fortawesome/free-solid-svg-icons'
+import { faHeart as farFaHeart } from '@fortawesome/free-regular-svg-icons'
+
+library.add(fasFaHeart, farFaHeart)
+
+const mapStateToProps = (state) => {
+  return {
+    favorisFilm: state.favorisFilm
+  }
+}
 
 class FilmDetail extends React.Component {
+
+  static navigationOptions = ({ navigation }) => {
+    const { params } = navigation.state
+    // On accède à la fonction shareFilm et au film via les paramètres qu'on a ajouté à la navigation
+    if (params.film != undefined) {
+      return {
+          // On a besoin d'afficher une image, il faut donc passe par une Touchable une fois de plus
+          headerRight: <TouchableOpacity
+                          style={styles.share_touchable_headerrightbutton}
+                          onPress={() => params.shareFilm()}>
+                          <Image
+                            style={styles.share_image}
+                            source={require('../assets/images/export.png')} />
+                        </TouchableOpacity>
+      }
+    }
+  }
 
   constructor(props){
     super(props)
     this.state = {
       film: undefined,
-      isLoading: true
+      isLoading: false
     }
+    this._shareFilm = this._shareFilm.bind(this)
+  }
+
+  componentDidMount(){
+    const favorisFilmIndex = this.props.favorisFilm.findIndex(item => item.id === this.props.navigation.state.params.idFilm)
+    if (favorisFilmIndex !== -1) { 
+      this.setState({
+        film: this.props.favorisFilm[favorisFilmIndex]
+      },() => { this._updateNavigationParams() })
+      return
+    }
+    this.setState({ isLoading: true })
+    getFilmDetailFromApi(this.props.navigation.getParam('idFilm'))
+    .then(data => {
+      this.setState({
+        film: data,
+        isLoading: false
+      }, () => { this._updateNavigationParams() })
+    })
   }
 
   _displayLoading(){
@@ -26,6 +75,40 @@ class FilmDetail extends React.Component {
         </View>
       )
     }
+  }
+
+  _updateNavigationParams() {
+    this.props.navigation.setParams({
+      shareFilm: this._shareFilm,
+      film: this.state.film
+    })
+  }
+
+  _shareFilm() {
+    const { film } = this.state
+    Share.share({ title: film.title, message: film.overview })
+  }
+
+  _toggleFavoris() {
+    const action = { type: "TOGGLE_FAVORIS", value: this.state.film }
+    this.props.dispatch(action)
+  }
+
+  _displayFavorisIcon(){
+    let favorisIcon = farFaHeart
+    if (this.props.favorisFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
+      // Film dans nos favoris
+      favorisIcon = fasFaHeart
+    }
+
+    return (
+      <FontAwesomeIcon icon={ favorisIcon } color={ 'pink' } size={ 40 } style={ styles.heart_icon } onPress={() => this._toggleFavoris()}/>
+    )
+  }
+
+  componentDidUpdate() {
+    console.log("componentDidUpdate : ")
+    console.log(this.props.favorisFilm.length)
   }
 
   _displayFilmDetail(film){
@@ -66,15 +149,19 @@ class FilmDetail extends React.Component {
                   {numeral(film.revenue).format('0,0[.]00 $')}
                 </Text>
               </View>
-              <View style={styles.vote_container}>
-                <AirbnbRating
-                  count={5}
-                  defaultRating={Math.round(film.vote_average/2)}
-                  reviews={["Nul", "Pas ouf", "Ça va", "Propre", "Excellent"]}
-                  size={20}
-                  reviewSize={20}
-                />
-                <Text style={[styles.text_light, styles.vote_count]}>({film.vote_count})</Text>
+              <View style={styles.aside_container}>
+                <View style={styles.vote_container}>
+                  <AirbnbRating
+                    count={5}
+                    defaultRating={Math.round(film.vote_average/2)}
+                    reviews={["Nul", "Pas ouf", "Ça va", "Propre", "Excellent"]}
+                    size={20}
+                    reviewSize={20}
+                    isDisabled
+                  />
+                  <Text style={[styles.text_light, styles.vote_count]}>({film.vote_count})</Text>
+                </View>
+                {this._displayFavorisIcon()}
               </View>
             </View>
             <View style={styles.overview_container}>
@@ -85,17 +172,6 @@ class FilmDetail extends React.Component {
         </ScrollView>
       )
     }
-  }
-
-  componentDidMount(){
-    getFilmDetailFromApi(this.props.navigation.getParam('idFilm'))
-    .then(data => {
-      console.log(data)
-      this.setState({
-        film: data,
-        isLoading: false
-      })
-    })
   }
 
   render() {
@@ -142,8 +218,12 @@ const styles = StyleSheet.create({
   list_item: {
     marginBottom: 5
   },
+  aside_container: {
+    flex: 1,
+    alignItems: 'center'
+  },
   vote_container: {
-    flex: 1
+    marginBottom: 15
   },
   vote_count: {
     textAlign: 'center'
@@ -153,6 +233,13 @@ const styles = StyleSheet.create({
   },
   overview: {
     textAlign: 'justify'
+  },
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
   text_light: {
     color: '#fafafa'
@@ -169,7 +256,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  share_touchable_headerrightbutton: {
+    marginRight: 15
+  },
+  share_image: {
+    height: 25,
+    width: 25
   }
 })
 
-export default FilmDetail
+export default connect(mapStateToProps)(FilmDetail)
+

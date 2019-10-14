@@ -22,3 +22,7 @@ export function getFilmTrailerFromApi (id) {
     .then((response) => response.json())
     .catch((error) => console.error(error));
 }
+
+export function getVideoTrailerFromYoutube (key) {
+  return 'https://www.youtube.com/watch?v=' + key
+}

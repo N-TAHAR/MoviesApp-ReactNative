@@ -3,12 +3,23 @@
 import React, { PureComponent } from 'react'
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native'
 import { getImageFromApi } from '../API/TMDBApi'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faHeart } from '@fortawesome/free-solid-svg-icons'
 
 class FilmItem extends PureComponent {
+
+  _displayFavorisIcon(){
+    if (this.props.isFilmFavoris) {
+      // Film dans nos favoris
+      return (
+        <FontAwesomeIcon icon={ faHeart } color={ 'pink' } size={ 15 }/>
+      )
+    }
+    return console.log('Dont WORK')
+  }
+  
   render() {
-    
     const { film, displayDetailForFilm } = this.props
-    console.log(film)
 
     return (
       <TouchableOpacity style={styles.main_container} onPress={() => displayDetailForFilm(film.id)}>
@@ -23,6 +34,7 @@ class FilmItem extends PureComponent {
           </View>
           <View style={styles.date_container}>
             <Text style={[styles.date_text, styles.text_light]}>{film.release_date} </Text>
+            {this._displayFavorisIcon()}
           </View>
         </View>
       </TouchableOpacity>
@@ -70,8 +82,9 @@ const styles = StyleSheet.create({
   },
   date_container: {
     flex: 1,
+    flexDirection: 'row',
+    justifyContent: "space-between",
     alignItems: "flex-end",
-    justifyContent: "flex-end",
   },
   date_text: {
     fontWeight: 'bold',
@@ -83,3 +96,4 @@ const styles = StyleSheet.create({
 })
 
 export default FilmItem
+// export default connect(mapStateToProps)(FilmItem)
