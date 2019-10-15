@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faHeart as fasFaHeart } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as farFaHeart } from '@fortawesome/free-regular-svg-icons'
+import ShrinkEnlarge from '../Animations/ShrinkEnlarge'
 
 library.add(fasFaHeart, farFaHeart)
 
@@ -96,13 +97,17 @@ class FilmDetail extends React.Component {
 
   _displayFavorisIcon(){
     let favorisIcon = farFaHeart
+    let shouldEnlarge = false
     if (this.props.favorisFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
       // Film dans nos favoris
       favorisIcon = fasFaHeart
+      shouldEnlarge = true
     }
 
     return (
-      <FontAwesomeIcon icon={ favorisIcon } color={ 'pink' } size={ 40 } style={ styles.heart_icon } onPress={() => this._toggleFavoris()}/>
+      <ShrinkEnlarge shouldEnlarge={shouldEnlarge}>
+        <FontAwesomeIcon icon={ favorisIcon } color={ 'pink' } size={ 30 } style={ styles.heart_icon } onPress={() => this._toggleFavoris()}/>
+      </ShrinkEnlarge>
     )
   }
 
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   vote_container: {
-    marginBottom: 15
+    marginBottom: 25
   },
   vote_count: {
     textAlign: 'center'

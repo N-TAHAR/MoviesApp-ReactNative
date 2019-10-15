@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Dimensions } from 'react-native'
 import { createAppContainer } from 'react-navigation'
 import { createStackNavigator } from 'react-navigation-stack'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
@@ -14,7 +14,10 @@ const SearchStackNavigator = createStackNavigator({
     screen: Search,
     navigationOptions: {
       title: 'Rechercher',
+      // headerBackTitle : null,
+      // headerTitleStyle: { width : Dimensions.get('window').width },
       headerStyle: {
+        fontFamily: 'Roboto-Bold',
         backgroundColor: '#050505',
       },
       headerTintColor: 'gold',

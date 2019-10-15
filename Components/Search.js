@@ -90,31 +90,6 @@ class Search extends Component {
             totalPages={this.totalPages} // les infos page et totalPages vont être utile, côté component FilmList, pour ne pas déclencher l'évènement pour charger plus de film si on a atteint la dernière page
             favoriteList={false}
           />
-          {/* <FlatList
-            indicatorStyle='black'
-            data={this.state.films}
-            extraData={this.props.favorisFilm}
-            keyExtractor={(item, index) => String(index)}
-            renderItem={({item}) => 
-              <FilmItem 
-                film={item} 
-                displayDetailForFilm={this._displayDetailForFilm}
-                isFilmFavoris={(this.props.favorisFilm.findIndex(film => film.id === item.id) !== -1) ? true : false}
-              /> 
-            }
-            onEndReachedThreshold={0.5}
-            onEndReached={() => {
-                if (this.page < this.totalPages) {
-                  this._loadFilms()
-                }
-            }}
-            refreshControl={
-              <RefreshControl
-                  tintColor="#fff"
-                  titleColor="#fff"
-               />
-            }
-          /> */}
           {this._displayLoading()}
         </View>
       </View>
